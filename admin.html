@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8"> <!-- 确保是 UTF-8 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理后台 - 智能写作平台</title>
+    <link rel="stylesheet" href="css/style.css"> <!-- 复用或创建 admin 专属样式 -->
+    <style>
+        /* admin.html 特有的一些简单样式 */
+        body {
+            margin: 0; /* 移除 body 默认的 margin */
+            display: flex;
+            flex-direction: column; /* 使得 top-nav 在 admin-container 上方 */
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f8f9fa; /* 更淡的背景 */
+            color: #212529;
+        }
+
+        .top-nav {
+            background-color: #343a40; /* 深色导航栏 */
+            color: white;
+            padding: 0 20px; /* 调整内边距 */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 60px;
+            box-sizing: border-box;
+            width: 100%; /* 占满宽度 */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* 添加阴影 */
+        }
+        .top-nav .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        .profile-area {
+            position: relative;
+        }
+        .profile-circle {
+            width: 36px; /* 稍小一点 */
+            height: 36px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        .profile-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 45px; /* 调整位置 */
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            width: 220px;
+        }
+        .profile-dropdown p {
+            padding: 12px 15px;
+            margin: 0;
+            font-size: 0.9em;
+            color: #333;
+            border-bottom: 1px solid #eee;
+        }
+        .profile-dropdown p strong {
+            display: block;
+            font-size: 1em;
+            margin-bottom: 3px;
+        }
+        .profile-dropdown button {
+            display: block;
+            width: 100%; /* 占满宽度 */
+            box-sizing: border-box;
+            padding: 10px 15px;
+            text-align: left;
+            border: none;
+            background: none;
+            cursor: pointer;
+            color: #333;
+            font-size: 0.9em;
+        }
+        .profile-dropdown button:hover {
+            background-color: #f0f0f0;
+        }
+
+
+        .admin-container {
+            display: flex;
+            flex-grow: 1; /* 占据剩余的垂直空间 */
+        }
+        .admin-sidebar {
+            width: 240px; /* 稍宽一点 */
+            background-color: #ffffff; /* 白色侧边栏 */
+            padding: 20px 15px;
+            border-right: 1px solid #e0e0e0;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+        }
+        .admin-sidebar h2 {
+            font-size: 1.1em; /* 导航标题稍小 */
+            color: #495057;
+            margin-top: 0;
+            margin-bottom: 20px; /* 减小间距 */
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            text-transform: uppercase; /* 大写 */
+            letter-spacing: 0.5px;   /* 字间距 */
+        }
+        .admin-sidebar ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        .admin-sidebar ul li a {
+            display: flex; /* 使用flex对齐图标和文字 */
+            align-items: center;
+            padding: 10px 15px;
+            color: #495057; /* 深灰色文字 */
+            text-decoration: none;
+            border-radius: 5px; /* 更圆润的边角 */
+            margin-bottom: 6px; /* 增加间距 */
+            font-size: 0.9em; /* 导航项文字稍小 */
+            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+        }
+        .admin-sidebar ul li a:hover {
+            background-color: #e9ecef; /* 淡悬停效果 */
+            color: #007bff;
+        }
+        .admin-sidebar ul li a.active {
+            background-color: #007bff;
+            color: white;
+            font-weight: 500;
+        }
+
+        .admin-content {
+            flex-grow: 1;
+            padding: 25px 30px; /* 增加内边距 */
+            overflow-y: auto; /* 内容多时可滚动 */
+        }
+        .admin-tab-content {
+            display: none;
+            background-color: #fff; /* 内容区白色背景 */
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .admin-tab-content.active {
+            display: block;
+        }
+        .admin-tab-content h3 {
+            margin-top: 0;
+            font-size: 1.6em; /* 标题大一点 */
+            color: #343a40;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px dotted #ccc;
+        }
+        .admin-tab-content h4 {
+            font-size: 1.2em;
+            color: #495057;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        /* 表单元素的一些基本样式 */
+        .form-group {
+            margin-bottom: 20px; /* 增加间距 */
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px; /* 增加间距 */
+            font-weight: 500; /* 普通粗细 */
+            color: #495057;
+        }
+        .form-group select, .form-group textarea, .form-group input[type="text"], .form-group input[type="number"] {
+            width: 100%;
+            padding: 10px; /* 增加内边距 */
+            border: 1px solid #ced4da; /* 边框颜色 */
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 0.95em;
+        }
+        .form-group textarea {
+            min-height: 100px; /* 增加最小高度 */
+            resize: vertical;
+            font-family: Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace; /* 等宽字体 */
+        }
+        .form-group p.description {
+            font-size: 0.85em; /* 稍小一点 */
+            color: #6c757d; /* 辅助文字颜色 */
+            margin-top: 8px;
+        }
+        button[type="button"].admin-button, /* 为 button type="button" 也应用样式 */
+        button[type="submit"], .admin-button { /* 确保 .admin-button 也能被应用 */
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px; /* 增加内边距 */
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.2s ease-in-out;
+            margin-right: 10px; /* 多个按钮时加间距 */
+        }
+        button[type="button"].admin-button:hover,
+        button[type="submit"]:hover, .admin-button:hover {
+            background-color: #0056b3;
+        }
+        hr {
+            border: none;
+            border-top: 1px solid #eee;
+            margin: 30px 0;
+        }
+    </style>
+</head>
+<body>
+    <nav class="top-nav">
+        <div class="logo">管理后台</div>
+        <div class="profile-area">
+            <div class="profile-circle" id="admin-profile-circle-icon">
+                <!-- JS会填充首字母 -->
+            </div>
+            <div class="profile-dropdown" id="admin-profile-dropdown-menu">
+                <p><strong><span id="admin-profile-user-name">管理员</span></strong><span id="admin-profile-user-email">邮箱</span></p>
+                <button id="admin-logout-button">退出登录</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="admin-container">
+        <aside class="admin-sidebar">
+            <h2>管理菜单</h2>
+            <ul>
+                <!-- 根据文档，Tab 1: 基础数据维护 (后续添加) -->
+                <!-- <li><a href="#" data-tab="basic-data">基础数据维护</a></li> -->
+
+                <!-- Tab 2: 全局 Prompt 与上下文维护 -->
+                <li><a href="#" data-tab="prompt-config">Prompt 与上下文</a></li>
+
+                <!-- Tab 3: 用户管理 (后续添加) -->
+                <!-- <li><a href="#" data-tab="user-management">用户管理</a></li> -->
+
+                <!-- Tab 4: 反馈意见查看与管理 (后续添加) -->
+                <!-- <li><a href="#" data-tab="feedback-management">反馈意见管理</a></li> -->
+
+                <!-- Tab 5: 平台设置 -->
+                <li><a href="#" class="active" data-tab="platform-settings">平台设置</a></li>
+
+                <!-- Tab 6, 7: 预留 -->
+                <!-- <li><a href="#" data-tab="reserved-1">预留功能1</a></li> -->
+                <!-- <li><a href="#" data-tab="reserved-2">预留功能2</a></li> -->
+            </ul>
+        </aside>
+
+        <main class="admin-content">
+            <!-- Tab 5: 平台设置 的内容 -->
+            <div id="platform-settings-tab" class="admin-tab-content"> <!-- 初始可能不是 active，JS 会控制 -->
+                <h3>平台 AI 设置</h3>
+                <p style="margin-bottom: 20px; color: #555;">管理平台核心 AI 模型的选择和参数配置。</p>
+                <form id="ai-settings-form">
+                    <div class="form-group">
+                        <label for="ai-model-select">当前激活的AI大语言模型:</label>
+                        <select id="ai-model-select" name="selectedChatModelName">
+                            <option value="gemini-1.5-flash-latest" selected>Google Gemini 1.5 Flash (推荐/测试)</option>
+                        </select>
+                        <p class="description">此处选择的模型将作为平台所有AI交互的核心引擎。</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="api-key-info">API Key 配置说明:</label>
+                        <textarea id="api-key-info" readonly rows="5" style="background-color: #e9ecef; font-family: monospace; font-size: 0.85em; color: #495057;">
+API Key 安全提示：
+--------------------------------------------------
+- 大语言模型的 API Key **严禁**在此处直接输入或存储在前端代码/Firestore中。
+- 必须通过安全的后端配置方式（例如 Firebase Cloud Functions 的环境变量）进行设置。
+- 云函数将从环境变量中读取并使用这些密钥。
+
+当前所需配置的环境变量 (在Firebase Cloud Functions中设置):
+- GEMINI_APIKEY="YOUR_GOOGLE_GEMINI_API_KEY"
+  (请替换 YOUR_GOOGLE_GEMINI_API_KEY 为您的真实密钥)
+
+忘记配置或配置错误将导致AI功能无法使用。
+                        </textarea>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Tab 2: Prompt与上下文维护 Tab 的内容区 -->
+            <div id="prompt-config-tab" class="admin-tab-content"> <!-- 初始不是 active，JS 会控制 -->
+                <h3>全局 Prompt 与上下文维护</h3>
+                <p style="margin-bottom: 20px; color: #555;">管理平台AI交互的核心指令和行为配置。这些配置将保存在 Firestore 的 `/settings/globalPromptConfig` 文档中。</p>
+
+                <form id="global-prompts-form">
+                    <h4>核心对话与反馈 Prompt</h4>
+                    <div class="form-group">
+                        <label for="global-system-prompt">1. 全局系统前置命令 (System Prompt)</label>
+                        <textarea id="global-system-prompt" name="defaultSystemPromptText" rows="6" placeholder="例如：你是一个友好的AI写作辅导助手，你的目标是帮助学生改进他们的写作。请始终使用简体中文回答，并保持耐心和鼓励的语气。"></textarea>
+                        <p class="description">用于学生与AI日常对话的基础指令，设定AI的基本角色、语气和行为准则。</p>
+                    </div>
+
+                    <hr>
+                    <h4>E-Portfolio 与报告生成 Prompt</h4>
+                    <div class="form-group">
+                        <label for="eportfolio-generation-prompt">2. E-Portfolio 生成 Prompt</label>
+                        <textarea id="eportfolio-generation-prompt" name="defaultEPortfolioGenerationPromptText" rows="10" placeholder="指导AI如何分析学生单次任务表现（包括作文、对话历史），并生成结构化的E-Portfolio数据点（如各项得分、常见错误、学习建议）和详细的文本报告。请明确输出的JSON结构（如果需要AI直接输出JSON）或文本报告的各个章节。"></textarea>
+                        <p class="description">用于指导AI分析学生单次任务表现并生成结构化数据和详细E-Portfolio文本报告 (对应文档4.6 AI分析当次任务部分)。</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="single-task-report-prompt">3. 单人单次任务总结报告 Prompt (精简版 - 可选)</label>
+                        <textarea id="single-task-report-prompt" name="defaultSingleTaskReportPromptText" rows="6" placeholder="如果需要一个比完整E-Portfolio文本更精简的、针对单次任务的总结报告，可以在此定义其生成指令。如果E-Portfolio Prompt已足够，此项可留空或不启用。"></textarea>
+                        <p class="description">可选，如果E-Portfolio生成Prompt中的详细报告已足够，此项可以不使用或作为其补充。</p>
+                    </div>
+
+                    <hr>
+                    <h4>教师端报告生成 Prompt</h4>
+                     <div class="form-group">
+                        <label for="teacher-class-single-task-report-prompt">4. 教师端班级单任务总结报告 Prompt</label>
+                        <textarea id="teacher-class-single-task-report-prompt" name="defaultTeacherClassSingleTaskReportPromptText" rows="8" placeholder="指导AI如何汇总分析特定任务下全班学生的表现（基于学生的个体E-Portfolio报告），并生成面向教师的、结构化的班级总结报告，包括共性问题、亮点、教学建议等。"></textarea>
+                        <p class="description">用于指导AI汇总分析特定任务下全班学生的表现，并生成面向教师的班级总结报告。</p>
+                    </div>
+
+                     <div class="form-group">
+                        <label for="teacher-class-cumulative-report-prompt">5. 教师端班级累积性总结报告 Prompt</label>
+                        <textarea id="teacher-class-cumulative-report-prompt" name="defaultTeacherClassCumulativeReportPromptText" rows="8" placeholder="指导AI如何分析班级多个任务的长期表现数据，进行趋势分析，总结班级整体的强项、持续挑战，并提供具有前瞻性的教学策略建议。"></textarea>
+                        <p class="description">用于指导AI分析班级多个任务的长期表现，并生成累积性的总结报告。</p>
+                    </div>
+
+
+                    <button type="button" id="save-global-prompts-button" class="admin-button">保存所有全局Prompt</button>
+                    <p id="global-prompts-save-message" style="margin-top:10px; display: inline-block; margin-left: 10px;"></p>
+                </form>
+            </div>
+
+        </main>
+    </div>
+
+    <script type="module" src="js/firebase-init.js"></script>
+    <script type="module" src="js/adminApp.js"></script>
+</body>
+</html>

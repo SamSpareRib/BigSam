@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教师后台 - 智能写作平台</title>
+    <link rel="stylesheet" href="css/style.css"> <!-- 复用或创建 teacher 专属样式 -->
+    <style>
+        /* teacher.html 特有的一些简单样式 (可以从 admin.html 借鉴和修改) */
+        body {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #212529;
+        }
+
+        .top-nav { /* 与 admin.html 和 chat.html 类似 */
+            background-color: #007bff; /* 教师端可以用蓝色主题 */
+            color: white;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 60px;
+            box-sizing: border-box;
+            width: 100%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .top-nav .logo { font-size: 1.5em; font-weight: bold; }
+        .top-nav .course-info { font-size: 1em; } /* 显示课程/班级信息 */
+
+        .profile-area { position: relative; }
+        .profile-circle {
+            width: 36px; height: 36px; background-color: #fff; color: #007bff;
+            border-radius: 50%; display: flex; justify-content: center;
+            align-items: center; cursor: pointer; font-weight: bold; font-size: 0.9em;
+            border: 1px solid #007bff;
+        }
+        .profile-dropdown { /* 与 admin.html 和 chat.html 类似 */
+            display: none; position: absolute; right: 0; top: 45px;
+            background-color: white; border: 1px solid #ddd; border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 1000; width: 220px;
+        }
+        .profile-dropdown p { padding: 12px 15px; margin: 0; font-size: 0.9em; color: #333; border-bottom: 1px solid #eee;}
+        .profile-dropdown p strong { display: block; font-size: 1em; margin-bottom: 3px; }
+        .profile-dropdown button {
+            display: block; width: 100%; box-sizing: border-box; padding: 10px 15px;
+            text-align: left; border: none; background: none; cursor: pointer; color: #333; font-size: 0.9em;
+        }
+        .profile-dropdown button:hover { background-color: #f0f0f0; }
+
+        .teacher-main-container {
+            padding: 20px;
+            flex-grow: 1;
+        }
+
+        .teacher-tabs {
+            display: flex;
+            border-bottom: 1px solid #dee2e6;
+            margin-bottom: 20px;
+        }
+        .teacher-tabs .tab-link {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 1em;
+            color: #495057;
+            border-bottom: 3px solid transparent; /* 为 active 状态预留边框空间 */
+            margin-right: 5px;
+        }
+        .teacher-tabs .tab-link:hover {
+            color: #0056b3;
+        }
+        .teacher-tabs .tab-link.active {
+            color: #007bff;
+            border-bottom: 3px solid #007bff;
+            font-weight: 500;
+        }
+
+        .teacher-tab-content {
+            display: none;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .teacher-tab-content.active {
+            display: block;
+        }
+        .teacher-tab-content h3 {
+            margin-top: 0; font-size: 1.6em; color: #343a40;
+            margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px dotted #ccc;
+        }
+    </style>
+</head>
+<body>
+    <nav class="top-nav">
+        <div class="logo">教师后台</div>
+        <div class="course-info">
+            课程: 初级写作体验课 / 班级: 测试一班 (单课程单班级测试版)
+        </div>
+        <div class="profile-area">
+            <div class="profile-circle" id="teacher-profile-circle-icon">T</div>
+            <div class="profile-dropdown" id="teacher-profile-dropdown-menu">
+                <p><strong><span id="teacher-profile-user-name">教师</span></strong><span id="teacher-profile-user-email">邮箱</span></p>
+                <button id="teacher-logout-button">退出登录</button>
+                <!-- 意见反馈按钮（根据文档5.5） -->
+                <button id="teacher-feedback-button" style="display:none;">意见反馈</button> <!-- 暂时隐藏 -->
+            </div>
+        </div>
+    </nav>
+
+    <div class="teacher-main-container">
+        <div class="teacher-tabs">
+            <button class="tab-link active" data-tab="dashboard">总览仪表盘</button>
+            <button class="tab-link" data-tab="tasks">任务管理</button>
+            <button class="tab-link" data-tab="students">学生管理</button>
+            <!-- 意见反馈可以放在右上角，或者这里也加一个Tab -->
+        </div>
+
+        <div id="dashboard-tab" class="teacher-tab-content active">
+            <h3>总览仪表盘</h3>
+            <p>这里将显示班级整体的累积性表现数据、按任务查看的数据等。（内容将在步骤 5.2 实现）</p>
+        </div>
+
+        <div id="tasks-tab" class="teacher-tab-content">
+            <h3>任务管理</h3>
+            <button id="add-new-task-button" class="admin-button" style="margin-bottom: 20px;">+ 发布新任务</button>
+            <h4>已发布任务列表:</h4>
+            <div id="task-list-container">
+            <!-- 任务列表将由JS动态填充 -->
+            <!-- 示例:
+            <div class="task-item">
+                <div class="task-item-header">
+                    <h5 class="task-title">任务一：描述你的周末</h5>
+                    <div class="task-actions">
+                        <button class="edit-task-btn" data-task-id="xyz">编辑</button>
+                        <button class="delete-task-btn" data-task-id="xyz" style="background-color:#dc3545;">删除</button>
+                    </div>
+                </div>
+                <p class="task-description">描述...</p>
+                <p><small>目标: ... | 评分标准: ... | 发布于: ...</small></p>
+            </div>
+             -->
+            </div>
+            <p id="tasks-loading-message" style="text-align: center; color: #777;"></p>
+        </div>
+
+        <div id="students-tab" class="teacher-tab-content">
+            <h3>学生管理</h3>
+            <p style="margin-bottom: 20px; color: #555;">查看班级内所有学生的列表和基本信息。 (当前显示所有学生用户)</p>
+
+    <!-- (可选) 学生搜索/筛选区域  -->
+    <div class="student-filter-area" style="margin-bottom: 20px;">
+        <input type="text" id="student-search-input" placeholder="按姓名或邮箱搜索学生..." style="padding: 8px; width: 300px;">
+    </div>
+
+    <div id="student-list-container">
+        <!-- 学生列表将由JS动态填充 -->
+        <!-- 示例 (表格):
+        <table class="table-styled">
+            <thead>
+                <tr>
+                    <th>姓名</th>
+                    <th>邮箱</th>
+                    <th>注册时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody id="student-list-tbody">
+                <tr>
+                    <td>张三</td>
+                    <td>zhangsan@example.com</td>
+                    <td>2024-05-01</td>
+                    <td><button class="view-student-details-btn" data-student-id="xyz">查看详情</button></td>
+                </tr>
+            </tbody>
+        </table>
+        -->
+        <!-- 示例 (列表): -->
+        <!-- <ul id="student-list-ul" style="list-style-type: none; padding: 0;"></ul> -->
+    </div>
+    <p id="students-loading-message" style="text-align: center; color: #777;"></p>
+        </div>
+    </div>
+
+    <!-- 新任务/编辑任务 模态框 (初始隐藏) -->
+<div id="task-form-modal" class="modal" style="display:none;">
+    <div class="modal-content" style="width: 60%; max-width: 700px;">
+        <span class="close-button" id="close-task-modal-button">×</span>
+        <h3 id="task-modal-title">发布新任务</h3>
+        <form id="task-form">
+            <input type="hidden" id="task-id-edit" value=""> <!-- 用于编辑时存储任务ID -->
+
+            <div class="form-group">
+                <label for="task-title">任务标题:</label>
+                <input type="text" id="task-title" required>
+            </div>
+            <div class="form-group">
+                <label for="task-description">任务详细描述/要求 (支持Markdown):</label>
+                <textarea id="task-description" rows="6" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="task-objectives">任务目标 (学生将看到):</label>
+                <input type="text" id="task-objectives" required placeholder="例如：练习议论文的段落结构和论证方法">
+            </div>
+            <div class="form-group">
+                <label for="task-ai-grading-standard">AI评分严格程度:</label>
+                <select id="task-ai-grading-standard">
+                    <option value="lenient">宽松</option>
+                    <option value="standard" selected>标准</option>
+                    <option value="strict">严格</option>
+                </select>
+            </div>
+            <div class="form-group" style="display:flex; justify-content: space-between;">
+                <div style="width: 48%;">
+                    <label for="task-start-date">开始日期 (可选):</label>
+                    <input type="date" id="task-start-date">
+                </div>
+                <div style="width: 48%;">
+                    <label for="task-end-date">截止日期 (可选):</label>
+                    <input type="date" id="task-end-date">
+                </div>
+            </div>
+
+            <button type="submit" id="save-task-button" class="admin-button">保存任务</button>
+            <p id="task-form-message" style="margin-top:10px; display: inline-block; margin-left: 10px;"></p>
+        </form>
+    </div>
+</div>
+
+    <!-- 通用模态框 (如果需要，可以从 chat.html 复制过来) -->
+    <div id="text-display-modal" class="modal" style="display:none;">
+                <div class="modal-content">
+                <span class="close-button" id="close-text-modal-button">×</span>
+                <h3 id="modal-title">E-Portfolio报告</h3>
+                <div id="modal-text-content" style="white-space: pre-wrap; max-height: 70vh; overflow-y: auto; border: 1px solid #eee; padding:10px; margin-top:10px; background-color:#f9f9f9;">
+                <!-- 文本内容将填充在这里 -->
+                </div>
+            </div>
+            </div>
+
+    <script type="module" src="js/firebase-init.js"></script>
+    <script type="module" src="js/teacherApp.js"></script> <!-- 我们将创建这个文件 -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</body>
+</html>

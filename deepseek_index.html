@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能写作反馈平台 - 登录/注册</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #FF6B00; /* 橙色 */
+            --secondary: #6A0DAD; /* 紫色 */
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --gray: #6c757d;
+            --light-purple: #f3e5f5;
+            --light-orange: #fff3e0;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #fff3e0 0%, #f3e5f5 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .logo-container {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .logo {
+            height: 100px;
+            margin-bottom: 15px;
+        }
+        
+        .main-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--secondary);
+            margin-bottom: 5px;
+            text-align: center;
+        }
+        
+        .subtitle {
+            color: var(--gray);
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .panels-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+            width: 100%;
+        }
+        
+        .panel {
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            transition: var(--transition);
+        }
+        
+        .panel:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .panel-header {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .panel-title {
+            font-size: 1.8rem;
+            color: var(--secondary);
+            margin-bottom: 10px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .panel-title:after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px;
+        }
+        
+        .panel-description {
+            color: var(--gray);
+            font-size: 1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .input-with-icon {
+            position: relative;
+        }
+        
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+        
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        
+        input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.2);
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            margin-top: 10px;
+        }
+        
+        .btn-primary:hover {
+            background: #e05a00;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+            margin-top: 10px;
+        }
+        
+        .btn-secondary:hover {
+            background: #5809a3;
+            transform: translateY(-2px);
+        }
+        
+        .link-text {
+            text-align: center;
+            margin-top: 20px;
+            color: var(--gray);
+        }
+        
+        .switch-link {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        
+        .switch-link:hover {
+            color: var(--primary);
+            text-decoration: underline;
+        }
+        
+        .error-message {
+            color: #e53935;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .user-info-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 600px;
+        }
+        
+        .welcome-message {
+            font-size: 1.5rem;
+            color: var(--secondary);
+            margin-bottom: 20px;
+        }
+        
+        .user-email {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 40px;
+            justify-content: center;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            width: 280px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: var(--transition);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+        
+        .feature-title {
+            font-size: 1.3rem;
+            color: var(--secondary);
+            margin-bottom: 15px;
+        }
+        
+        .feature-desc {
+            color: var(--gray);
+            line-height: 1.6;
+        }
+        
+        @media (max-width: 900px) {
+            .panels-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .panel {
+                max-width: 100%;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .panel {
+                padding: 30px 20px;
+            }
+            
+            .main-title {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Logo区域 -->
+        <div class="logo-container">
+            <img src="https://unienrol.com/files/shares/content/universities/USM-v.png" alt="智能写作反馈平台Logo" class="logo">
+            <h1 class="main-title">智能写作反馈平台</h1>
+            <p class="subtitle">提升写作能力，获得专业反馈</p>
+        </div>
+        
+        <!-- 用户信息区域 (登录后显示) -->
+        <div id="user-info-container" class="user-info-container" style="display:none;">
+            <p class="welcome-message">欢迎回来, <span id="user-email" class="user-email"></span>!</p>
+            <button id="logout-button" class="btn btn-secondary">退出登录</button>
+        </div>
+        
+        <!-- 登录和注册面板容器 -->
+        <div class="panels-container">
+            <!-- 登录面板 -->
+            <div id="login-container" class="panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">用户登录</h2>
+                    <p class="panel-description">使用您的账户登录以开始使用</p>
+                </div>
+                
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="login-email">邮箱</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-envelope input-icon"></i>
+                            <input type="email" id="login-email" placeholder="请输入您的邮箱" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="login-password">密码</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-lock input-icon"></i>
+                            <input type="password" id="login-password" placeholder="请输入您的密码" required>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">登录</button>
+                    <p id="login-error" class="error-message"></p>
+                </form>
+                
+                <p class="link-text">还没有账户? <a href="#" id="show-register-link" class="switch-link">立即注册</a></p>
+            </div>
+            
+            <!-- 注册面板 -->
+            <div id="register-container" class="panel" style="display:none;">
+                <div class="panel-header">
+                    <h2 class="panel-title">用户注册</h2>
+                    <p class="panel-description">创建新账户以获取完整功能</p>
+                </div>
+                
+                <form id="register-form">
+                    <div class="form-group">
+                        <label for="register-name">姓名</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-user input-icon"></i>
+                            <input type="text" id="register-name" placeholder="请输入您的姓名" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="register-email">邮箱</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-envelope input-icon"></i>
+                            <input type="email" id="register-email" placeholder="请输入您的邮箱" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="register-password">密码</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-lock input-icon"></i>
+                            <input type="password" id="register-password" placeholder="至少6位字符" minlength="6" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="register-confirm-password">确认密码</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-lock input-icon"></i>
+                            <input type="password" id="register-confirm-password" placeholder="请再次输入密码" minlength="6" required>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">注册</button>
+                    <p id="register-error" class="error-message"></p>
+                </form>
+                
+                <p class="link-text">已有账户? <a href="#" id="show-login-link" class="switch-link">返回登录</a></p>
+            </div>
+        </div>
+        
+        <!-- 平台功能特色 -->
+        <div class="features">
+            <div class="feature-card">
+                <i class="fas fa-robot feature-icon"></i>
+                <h3 class="feature-title">AI智能分析</h3>
+                <p class="feature-desc">利用先进AI技术分析您的写作，提供专业反馈和改进建议</p>
+            </div>
+            
+            <div class="feature-card">
+                <i class="fas fa-chart-line feature-icon"></i>
+                <h3 class="feature-title">进步追踪</h3>
+                <p class="feature-desc">可视化您的写作能力进步，明确优势和需要提升的领域</p>
+            </div>
+            
+            <div class="feature-card">
+                <i class="fas fa-comments feature-icon"></i>
+                <h3 class="feature-title">专家反馈</h3>
+                <p class="feature-desc">除了AI分析，还可获得专业写作导师的个性化反馈</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/firebase-init.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    
+    <script type="module">
+        import { app } from './js/firebase-init.js';
+        if (app) {
+            console.log("Firebase App 已成功初始化！", app.name);
+        } else {
+            console.error("Firebase App 初始化失败！");
+        }
+        
+        // 显示/隐藏登录和注册表单
+        document.getElementById('show-register-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('login-container').style.display = 'none';
+            document.getElementById('register-container').style.display = 'block';
+        });
+        
+        document.getElementById('show-login-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('register-container').style.display = 'none';
+            document.getElementById('login-container').style.display = 'block';
+        });
+    </script>
+</body>
+</html>

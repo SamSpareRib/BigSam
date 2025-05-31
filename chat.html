@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学生端 - 智能写作任务</title>
+    <link rel="stylesheet" href="css/style.css"> <!-- 复用 index.html 的样式，或为其创建专属样式 -->
+    <style>
+        /* chat.html 特有的一些简单样式 */
+        #main-content {
+            display: flex; /* 左右布局：任务列表 和 聊天/仪表盘区域 */
+            height: calc(100vh - 100px); /* 减去头部和一些边距的高度 */
+        }
+
+        #sidebar { /* 用于任务列表 或 未来E-Portfolio的Tab导航 */
+            width: 250px;
+            padding: 15px;
+            border-right: 1px solid #ccc;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+        }
+
+        #sidebar h2 {
+            margin-top: 0;
+            font-size: 1.2em;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        #task-list-area ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #task-list-area li {
+            padding: 10px;
+            margin-bottom: 8px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #task-list-area li:hover {
+            background-color: #e9e9e9;
+        }
+        #task-list-area .task-title {
+            font-weight: bold;
+        }
+         #task-list-area .task-status {
+            font-size: 0.8em;
+            color: #777;
+            margin-left: 10px;
+        }
+
+
+        #content-area { /* 用于聊天界面 或 E-Portfolio仪表盘 */
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 0px; /* chatInterface 会有自己的padding */
+        }
+
+        /* 聊天界面 */
+        #chat-interface {
+            display: none; /* 初始隐藏，点击任务后显示 */
+            flex-direction: column;
+            height: 100%; /* 占满 content-area */
+            background-color: #fff;
+        }
+
+        .chat-header {
+            padding: 10px 15px;
+            background-color: #f1f1f1;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-header h3 {
+            margin: 0;
+            font-size: 1.1em;
+        }
+        #back-to-tasks-button {
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+
+        #chatbox {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            background-color: #f9f9f9;
+        }
+        .message {
+            padding: 8px 12px;
+            margin-bottom: 10px;
+            border-radius: 15px;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+        .user-message {
+            background-color: #007bff;
+            color: white;
+            margin-left: auto; /* 用户消息靠右 */
+            border-bottom-right-radius: 5px;
+        }
+        .model-message {
+            background-color: #e9ecef;
+            color: #333;
+            margin-right: auto; /* AI消息靠左 */
+            border-bottom-left-radius: 5px;
+        }
+        .system-message { /* 用于系统提示，例如“作文已提交” */
+            font-style: italic;
+            color: #666;
+            text-align: center;
+            font-size: 0.9em;
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
+
+
+        .chat-input-area {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #ddd;
+            background-color: #f8f9fa;
+        }
+        #user-input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            margin-right: 10px;
+            resize: none; /* 禁止拖拽调整大小 */
+        }
+        #send-button {
+            padding: 10px 15px;
+            border-radius: 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        #send-button:hover {
+            background-color: #0056b3;
+        }
+
+        /* 右上角用户信息区 */
+        .top-nav {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .top-nav .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        .profile-area {
+            position: relative;
+        }
+        .profile-circle {
+            width: 40px;
+            height: 40px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .profile-dropdown {
+            display: none; /* JS控制显示/隐藏 */
+            position: absolute;
+            right: 0;
+            top: 50px;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            width: 200px;
+        }
+        .profile-dropdown p {
+            padding: 10px 15px;
+            margin: 0;
+            font-size: 0.9em;
+            color: #333;
+        }
+        .profile-dropdown p strong {
+            display: block;
+            font-size: 1em;
+            margin-bottom: 3px;
+        }
+        .profile-dropdown button {
+            display: block;
+            width: calc(100% - 30px);
+            margin: 0 15px 10px 15px;
+            padding: 8px 10px;
+            text-align: left;
+            border: none;
+            background: none;
+            cursor: pointer;
+            color: #333;
+        }
+        .profile-dropdown button:hover {
+            background-color: #f0f0f0;
+        }
+
+        /* E-Portfolio 仪表盘区域 (暂时占位) */
+        #eportfolio-dashboard-area {
+            padding: 20px;
+            /* 初始可能显示，聊天时隐藏 */
+        }
+        .chat-action-button {
+            padding: 10px 15px;
+            border-radius: 20px; /* 与发送按钮一致或自定义 */
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        .chat-action-button:hover {
+            opacity: 0.8;
+        }
+        /* 可以禁用时的样式 */
+        .chat-action-button:disabled {
+            background-color: #ccc !important;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+    </style>
+</head>
+<body>
+    <nav class="top-nav">
+        <div class="logo">智能写作平台</div>
+        <div class="profile-area">
+            <div class="profile-circle" id="profile-circle-icon">
+                <!-- JS会填充首字母 -->
+            </div>
+            <div class="profile-dropdown" id="profile-dropdown-menu">
+                <p><strong><span id="profile-user-name">用户名</span></strong><span id="profile-user-email">邮箱</span></p>
+                <button id="chat-logout-button">退出登录</button>
+                <!-- 未来可添加“意见反馈”按钮 -->
+            </div>
+        </div>
+    </nav>
+
+    <div id="main-content">
+        <aside id="sidebar">
+            <!-- 左侧边栏，初始显示任务列表 -->
+            <div id="task-list-area">
+                <h2>我的任务</h2>
+                <ul id="tasks-ul">
+                    <!-- 任务项将由 JS 动态填充 -->
+                    <!-- 示例:
+                    <li data-task-id="task1">
+                        <span class="task-title">任务一：描述你的周末</span>
+                        <span class="task-status">(进行中)</span>
+                    </li>
+                    -->
+                </ul>
+                <p id="task-list-message" style="text-align: center; color: #777;"></p> <!-- 用于显示“加载中”或“无任务” -->
+            </div>
+
+            <!-- 未来E-Portfolio的Tab导航可以放在这里，或者任务列表本身就是E-Portfolio的一部分 -->
+        </aside>
+
+        <section id="content-area">
+            <!-- 右侧主内容区，初始可以显示E-Portfolio仪表盘，或提示选择任务 -->
+            <div id="eportfolio-dashboard-area">
+                <h2>我的E-Portfolio (仪表盘)</h2>
+                <p>欢迎来到您的E-Portfolio仪表盘！请从左侧选择一个任务开始。</p>
+                <button id="view-eportfolio-text-button" class="action-button" style="margin-top: 15px;">查看我的E-Portfolio完整报告</button>
+                <!-- 仪表盘内容将在后续步骤中填充 -->
+            </div>
+
+            <!-- 通用文本显示模态框 (初始隐藏) -->
+            <div id="text-display-modal" class="modal" style="display:none;">
+                <div class="modal-content">
+                <span class="close-button" id="close-text-modal-button">×</span>
+                <h3 id="modal-title">E-Portfolio报告</h3>
+                <div id="modal-text-content" style="white-space: pre-wrap; max-height: 70vh; overflow-y: auto; border: 1px solid #eee; padding:10px; margin-top:10px; background-color:#f9f9f9;">
+                <!-- 文本内容将填充在这里 -->
+                </div>
+            </div>
+            </div>
+
+            <div id="chat-interface"> <!-- 初始隐藏 -->
+                <div class="chat-header">
+                    <button id="back-to-tasks-button">⬅返回</button>
+                    <h3 id="chat-header-title">任务标题</h3>
+                </div>
+                <div id="chatbox">
+                    <!-- 聊天消息将由 JS 动态填充 -->
+                    <!-- 示例:
+                    <div class="message model-message">你好！请上传你的作文。</div>
+                    <div class="message user-message">这是我的作文...</div>
+                    -->
+                </div>
+                <div class="chat-input-area">
+                    <button id="complete-task-button" class="chat-action-button" style="margin-right: 10px; background-color: #28a745;">完成本次任务</button>
+                    <textarea id="user-input" placeholder="在此输入您的消息..." rows="2"></textarea>
+                    <button id="send-button">发送</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- 引入 Firebase 初始化脚本 和 学生端主逻辑脚本 -->
+    <script type="module" src="js/firebase-init.js"></script>
+    <script type="module" src="js/chatApp.js"></script> <!-- 我们将创建这个文件 -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</body>
+</html>

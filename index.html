@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能写作反馈平台 - 登录/注册</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <h1>欢迎来到智能写作反馈平台</h1>
+
+    <!-- 用户信息及退出按钮区域 (登录后显示) -->
+    <div id="user-info-container" style="display:none;">
+        <p>欢迎, <span id="user-email"></span>!</p>
+        <button id="logout-button">退出登录</button>
+    </div>
+
+    <!-- 登录表单区域 -->
+    <div id="login-container">
+        <h2>用户登录</h2>
+        <form id="login-form">
+            <div>
+                <label for="login-email">邮箱:</label>
+                <input type="email" id="login-email" required>
+            </div>
+            <div>
+                <label for="login-password">密码:</label>
+                <input type="password" id="login-password" required>
+            </div>
+            <button type="submit">登录</button>
+            <p id="login-error" class="error-message" style="color:red;"></p>
+        </form>
+        <p>还没有账户? <a href="#" id="show-register-link">立即注册</a></p>
+    </div>
+
+    <!-- 注册表单区域 -->
+    <div id="register-container" style="display:none;">
+        <h2>用户注册</h2>
+        <form id="register-form">
+            <div>
+                <label for="register-name">姓名:</label> <!-- 根据文档，注册时需要姓名 -->
+                <input type="text" id="register-name" required>
+            </div>
+            <div>
+                <label for="register-email">邮箱:</label>
+                <input type="email" id="register-email" required>
+            </div>
+            <div>
+                <label for="register-password">密码 (至少6位):</label>
+                <input type="password" id="register-password" minlength="6" required>
+            </div>
+            <div>
+                <label for="register-confirm-password">确认密码:</label>
+                <input type="password" id="register-confirm-password" minlength="6" required>
+            </div>
+            <button type="submit">注册</button>
+            <p id="register-error" class="error-message" style="color:red;"></p>
+        </form>
+        <p>已有账户? <a href="#" id="show-login-link">返回登录</a></p>
+    </div>
+
+    <script type="module" src="js/firebase-init.js"></script>
+    <script type="module" src="js/auth.js"></script>
+
+    <script type="module">
+        import { app } from './js/firebase-init.js';
+        if (app) {
+            console.log("Firebase App 已成功初始化！", app.name);
+        } else {
+            console.error("Firebase App 初始化失败！");
+        }
+    </script>
+</body>
+</html>
